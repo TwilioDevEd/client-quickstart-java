@@ -58,13 +58,7 @@ your user account.
 
 ## All Platforms
 
-Next, we need to install our depenedencies from Maven:
-
-```bash
-mvn install
-```
-
-And compile our application code:
+Next, we need to install our depenedencies from Maven and compile our application code:
 
 ```bash
 mvn package
