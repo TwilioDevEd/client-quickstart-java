@@ -58,13 +58,7 @@ your user account.
 
 ## All Platforms
 
-Next, we need to install our depenedencies from Maven:
-
-```bash
-mvn install
-```
-
-And compile our application code:
+Next, we need to install our depenedencies from Maven and compile our application code:
 
 ```bash
 mvn package
@@ -73,7 +67,7 @@ mvn package
 Run the application using the `java -jar` command.
 
 ```bash
-java -jar target/video-quickstart-1.0-SNAPSHOT.jar
+java -jar target/client-quickstart-1.0-SNAPSHOT.jar
 ```
 
 Your application should now be running at [http://localhost:4567](http://localhost:4567). 
