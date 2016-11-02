@@ -4,17 +4,26 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.staticFileLocation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
-import com.twilio.sdk.client.TwilioCapability;
-import com.twilio.sdk.verbs.TwiMLResponse;
-import com.twilio.sdk.verbs.TwiMLException;
-import com.twilio.sdk.verbs.Say;
-import com.twilio.sdk.verbs.Dial;
-import com.twilio.sdk.verbs.Number;
-import com.twilio.sdk.verbs.Client;
+
+// Token generation imports
+import com.twilio.jwt.Jwt;
+import com.twilio.jwt.client.ClientCapability;
+import com.twilio.jwt.client.IncomingClientScope;
+import com.twilio.jwt.client.OutgoingClientScope;
+import com.twilio.jwt.client.Scope;
+
+// TwiML generation imports
+import com.twilio.twiml.VoiceResponse;
+import com.twilio.twiml.Dial;
+import com.twilio.twiml.Number;
+import com.twilio.twiml.Client;
+import com.twilio.twiml.Say;
 
 public class Webapp {
   
@@ -34,13 +43,14 @@ public class Webapp {
       String identity = faker.firstName() + faker.lastName() + faker.zipCode();
       
       // Generate capability token
-      TwilioCapability capability = new TwilioCapability(acctSid, authToken);
-      capability.allowClientOutgoing(applicationSid);
-      capability.allowClientIncoming(identity);
-      String token = capability.generateToken();
+      List<Scope> scopes = new ArrayList<>();
+      scopes.add(new IncomingClientScope(identity));
+      scopes.add(new OutgoingClientScope.Builder(applicationSid).build());
+      Jwt jwt = new ClientCapability.Builder(acctSid, authToken).scopes(scopes).build();
+      String token = jwt.toJwt();
         
       // create JSON response payload 
-      HashMap<String, String> json = new HashMap<String, String>();
+      HashMap<String, String> json = new HashMap<>();
       json.put("identity", identity);
       json.put("token", token);
 
@@ -52,31 +62,31 @@ public class Webapp {
     
     // Generate voice TwiML
     post("/voice", "application/x-www-form-urlencoded", (request, response) -> {
-      TwiMLResponse twiml = new TwiMLResponse();
-      try {
-        String to = request.queryParams("To");
-        if (to != null) {
-          Dial dial = new Dial();
-          dial.setCallerId(System.getenv("TWILIO_CALLER_ID"));
+      VoiceResponse voiceTwimlResponse;
+      String to = request.queryParams("To");
+      if (to != null) {
+        Dial.Builder dialBuilder = new Dial.Builder()
+          .callerId(System.getenv("TWILIO_CALLER_ID"));
 
-          // wrap the phone number or client name in the appropriate TwiML verb
-          // by checking if the number given has only digits and format symbols
-          if(to.matches("^[\\d\\+\\-\\(\\) ]+$")) {
-            dial.append(new Number(to));
-          } else {
-            dial.append(new Client(to));
-          }
-
-          twiml.append(dial);
+        // wrap the phone number or client name in the appropriate TwiML verb
+        // by checking if the number given has only digits and format symbols
+        if(to.matches("^[\\d\\+\\-\\(\\) ]+$")) {
+          dialBuilder = dialBuilder.number(new Number.Builder(to).build());
         } else {
-          twiml.append(new Say("Thanks for calling!"));
+          dialBuilder = dialBuilder.client(new Client.Builder(to).build());
         }
-      } catch (TwiMLException e) {
-        e.printStackTrace();
+
+        voiceTwimlResponse = new VoiceResponse.Builder()
+          .dial(dialBuilder.build())
+          .build();
+      } else {
+        voiceTwimlResponse = new VoiceResponse.Builder()
+          .say(new Say.Builder("Thanks for calling!").build())
+          .build();
       }
 
       response.header("Content-Type", "text/xml"); 
-      return twiml.toXML();
+      return voiceTwimlResponse.toXml();
     });
   }
 }
