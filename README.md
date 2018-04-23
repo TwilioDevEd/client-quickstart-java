@@ -1,10 +1,6 @@
 # Twilio Client Quickstart for Java
 
 This application should give you a ready-made starting point for writing your
-own video apps with Twilio Video. Before we begin, we need to collect
-all the config values we need to run the application:
-
-This application should give you a ready-made starting point for writing your
 own voice apps with Twilio Client. Before we begin, we need to collect
 all the config values we need to run the application:
 
