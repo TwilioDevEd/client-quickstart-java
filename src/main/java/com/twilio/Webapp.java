@@ -21,10 +21,10 @@ import com.twilio.jwt.client.Scope;
 
 // TwiML generation imports
 import com.twilio.twiml.VoiceResponse;
-import com.twilio.twiml.Dial;
-import com.twilio.twiml.Number;
-import com.twilio.twiml.Client;
-import com.twilio.twiml.Say;
+import com.twilio.twiml.voice.Dial;
+import com.twilio.twiml.voice.Number;
+import com.twilio.twiml.voice.Client;
+import com.twilio.twiml.voice.Say;
 
 public class Webapp {
 
@@ -44,7 +44,7 @@ public class Webapp {
             String authToken = System.getenv("TWILIO_AUTH_TOKEN");
             String applicationSid = System.getenv("TWILIO_TWIML_APP_SID");
             // Generate a random username for the connecting client
-            String identity = faker.firstName() + faker.lastName() + faker.zipCode();
+            String identity = faker.name().firstName() + faker.address().zipCode();
 
             // Generate capability token
             List<Scope> scopes = new ArrayList<>();
