@@ -1,8 +1,6 @@
 # Twilio Client Quickstart for Java
 
-This application should give you a ready-made starting point for writing your
-own video apps with Twilio Video. Before we begin, we need to collect
-all the config values we need to run the application:
+> We are currently in the process of updating this sample template. If you are encountering any issues with the sample, please open an issue at [github.com/twilio-labs/code-exchange/issues](https://github.com/twilio-labs/code-exchange/issues) and we'll try to help you.
 
 This application should give you a ready-made starting point for writing your
 own voice apps with Twilio Client. Before we begin, we need to collect
@@ -58,13 +56,7 @@ your user account.
 
 ## All Platforms
 
-Next, we need to install our depenedencies from Maven:
-
-```bash
-mvn install
-```
-
-And compile our application code:
+Next, we need to install our depenedencies from Maven and compile our application code:
 
 ```bash
 mvn package
@@ -73,7 +65,7 @@ mvn package
 Run the application using the `java -jar` command.
 
 ```bash
-java -jar target/video-quickstart-1.0-SNAPSHOT.jar
+java -jar target/client-quickstart-1.0-SNAPSHOT.jar
 ```
 
 Your application should now be running at [http://localhost:4567](http://localhost:4567). 
