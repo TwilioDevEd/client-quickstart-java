@@ -5,19 +5,14 @@ import static spark.Spark.post;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.afterAfter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 
 // Token generation imports
-import com.twilio.jwt.Jwt;
-import com.twilio.jwt.client.ClientCapability;
-import com.twilio.jwt.client.IncomingClientScope;
-import com.twilio.jwt.client.OutgoingClientScope;
-import com.twilio.jwt.client.Scope;
+import com.twilio.jwt.accesstoken.AccessToken;
+import com.twilio.jwt.accesstoken.VoiceGrant;
 
 // TwiML generation imports
 import com.twilio.twiml.VoiceResponse;
@@ -41,17 +36,24 @@ public class Webapp {
         // Create a capability token using our Twilio credentials
         get("/token", "application/json", (request, response) -> {
             String acctSid = System.getenv("TWILIO_ACCOUNT_SID");
-            String authToken = System.getenv("TWILIO_AUTH_TOKEN");
             String applicationSid = System.getenv("TWILIO_TWIML_APP_SID");
+            String apiKey = System.getenv("API_KEY");
+            String apiSecret = System.getenv("API_SECRET");
             // Generate a random username for the connecting client
             String identity = faker.name().firstName() + faker.address().zipCode();
 
-            // Generate capability token
-            List<Scope> scopes = new ArrayList<>();
-            scopes.add(new IncomingClientScope(identity));
-            scopes.add(new OutgoingClientScope.Builder(applicationSid).build());
-            Jwt jwt = new ClientCapability.Builder(acctSid, authToken).scopes(scopes).build();
-            String token = jwt.toJwt();
+            // Create Voice grant
+            VoiceGrant grant = new VoiceGrant();
+            grant.setOutgoingApplicationSid(applicationSid);
+
+            // Optional: add to allow incoming calls
+            grant.setIncomingAllow(true);
+
+            // Create access token
+            AccessToken accessToken = new AccessToken.Builder(acctSid, apiKey, apiSecret)
+                    .identity(identity).grant(grant).build();
+
+            String token = accessToken.toJwt();
 
             // create JSON response payload
             HashMap<String, String> json = new HashMap<>();
