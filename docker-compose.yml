@@ -1,0 +1,14 @@
+version: "3.6"
+services:
+  app:
+    stdin_open: true
+    tty: true
+    environment:
+      - TWILIO_ACCOUNT_SID=your_account_sid
+      - TWILIO_CALLER_ID=+1XXXYYYZZZZ
+      - TWILIO_TWIML_APP_SID=APXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      - API_KEY=SKXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      - API_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    build: .
+    ports: 
+      - "8080:8080"

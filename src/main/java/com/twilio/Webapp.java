@@ -2,6 +2,7 @@ package com.twilio;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.afterAfter;
 
@@ -37,16 +38,16 @@ public class Webapp {
         // Create Voice grant
         VoiceGrant grant = new VoiceGrant();
         grant.setOutgoingApplicationSid(applicationSid);
-
+        
         // Optional: add to allow incoming calls
         grant.setIncomingAllow(true);
-
+        
         // Create access token
         AccessToken accessToken = new AccessToken.Builder(acctSid, apiKey, apiSecret).identity(identity).grant(grant)
-                .build();
-
+        .build();
+        
         String token = accessToken.toJwt();
-
+        
         // create JSON response payload
         HashMap<String, String> json = new HashMap<>();
         json.put("identity", identity);
@@ -84,6 +85,9 @@ public class Webapp {
     }
 
     public static void main(String[] args) {
+        // Default port 8080
+        port(8080);
+
         // Serve static files from src/main/resources/public
         staticFileLocation("/public");
 
