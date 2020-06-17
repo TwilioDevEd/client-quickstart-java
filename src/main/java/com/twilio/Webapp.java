@@ -43,8 +43,10 @@ public class Webapp {
         grant.setIncomingAllow(true);
         
         // Create access token
-        AccessToken accessToken = new AccessToken.Builder(acctSid, apiKey, apiSecret).identity(identity).grant(grant)
-        .build();
+        AccessToken accessToken = new AccessToken.Builder(acctSid, apiKey, apiSecret)
+                .identity(identity)
+                .grant(grant)
+                .build();
         
         String token = accessToken.toJwt();
         
@@ -56,6 +58,19 @@ public class Webapp {
         Gson gson = new Gson();
         return gson.toJson(json);
     }
+
+    private static boolean isPhoneNumber(String to) {
+        return to.matches("^[\\d\\+\\-\\(\\) ]+$");
+    }
+
+    private static Dial.Builder addChildReceiver(Dial.Builder builder, String to) {
+        // wrap the phone number or client name in the appropriate TwiML verb
+        // by checking if the number given has only digits and format symbols
+        if (Webapp.isPhoneNumber(to)) {
+            return builder.number(new Number.Builder(to).build());
+        }
+        return builder.client(new Client.Builder(to).build());
+    }
     
     public static String createVoiceResponse(String to) {
         VoiceResponse voiceTwimlResponse;
@@ -64,16 +79,10 @@ public class Webapp {
             Dial.Builder dialBuilder = new Dial.Builder()
                     .callerId(System.getenv("TWILIO_CALLER_ID"));
 
-            // wrap the phone number or client name in the appropriate TwiML verb
-            // by checking if the number given has only digits and format symbols
-            if(to.matches("^[\\d\\+\\-\\(\\) ]+$")) {
-                dialBuilder = dialBuilder.number(new Number.Builder(to).build());
-            } else {
-                dialBuilder = dialBuilder.client(new Client.Builder(to).build());
-            }
+            Dial.Builder dialBuilderWithReceiver = Webapp.addChildReceiver(dialBuilder, to);
 
             voiceTwimlResponse = new VoiceResponse.Builder()
-                    .dial(dialBuilder.build())
+                    .dial(dialBuilderWithReceiver.build())
                     .build();
         } else {
             voiceTwimlResponse = new VoiceResponse.Builder()
