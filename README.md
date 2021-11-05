@@ -61,28 +61,6 @@ After the above requirements have been met:
     ```
     See [Twilio Account Settings](#twilio-account-settings) to locate the necessary environment variables.
 
-    If you are using a UNIX operating system, load the environment variables before the application starts.
-
-    ```bash
-    source .env
-    ```
-
-    _If you are using a different operating system, make sure that all the variables from the `.env` file are loaded into your environment._
-
-    If you are using Windows (Powershell):
-
-    ```powershell
-    cp .env.example.ps1 .env.ps1
-    ```
-
-    Edit `.env.ps1` with the four configuration parameters we gathered from above. "Dot-source" the file in PowerShell like so:
-
-    ```powershell
-    . .\.env.ps1
-    ```
-
-    This assumes you will run the application in the same PowerShell session. If not, edit the `.env.ps1` and uncomment the `[Environment]::SetEnvironmentVariable` calls. After re-running the script, the environment variables will be peramently set for your user account.
-
 3. Build the project
 
     ```bash

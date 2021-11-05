@@ -5,11 +5,15 @@ import static spark.Spark.post;
 import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.afterAfter;
+import spark.template.thymeleaf.ThymeleafTemplateEngine;
+import spark.ModelAndView;
 
+import java.util.Map;
 import java.util.HashMap;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
+import io.github.cdimascio.dotenv.Dotenv;
 
 // Token generation imports
 import com.twilio.jwt.accesstoken.AccessToken;
@@ -23,7 +27,8 @@ import com.twilio.twiml.voice.Client;
 import com.twilio.twiml.voice.Say;
 
 public class Webapp {
-    
+    private static Dotenv env = Dotenv.configure().ignoreIfMissing().load();
+
     public static String generateIdentity() {
         // Create a Faker instance to generate a random username for the connecting user
         Faker faker = new Faker();
@@ -31,10 +36,10 @@ public class Webapp {
     }
 
     public static String createJsonAccessToken(String identity) {
-        String acctSid = System.getenv("TWILIO_ACCOUNT_SID");
-        String applicationSid = System.getenv("TWILIO_TWIML_APP_SID");
-        String apiKey = System.getenv("API_KEY");
-        String apiSecret = System.getenv("API_SECRET");
+        String acctSid = env.get("TWILIO_ACCOUNT_SID");
+        String applicationSid = env.get("TWILIO_TWIML_APP_SID");
+        String apiKey = env.get("API_KEY");
+        String apiSecret = env.get("API_SECRET");
         // Create Voice grant
         VoiceGrant grant = new VoiceGrant();
         grant.setOutgoingApplicationSid(applicationSid);
@@ -77,7 +82,7 @@ public class Webapp {
         
         if (to != null) {
             Dial.Builder dialBuilder = new Dial.Builder()
-                    .callerId(System.getenv("TWILIO_CALLER_ID"));
+                    .callerId(env.get("TWILIO_CALLER_ID"));
 
             Dial.Builder dialBuilderWithReceiver = Webapp.addChildReceiver(dialBuilder, to);
 
@@ -111,6 +116,13 @@ public class Webapp {
             // Render JSON response
             response.header("Content-Type", "application/json");
             return Webapp.createJsonAccessToken(identity);
+        });
+
+        get("/error", (req, res) -> {
+            Map<String, Object> model = new HashMap<String, Object>();
+            return new ThymeleafTemplateEngine().render(
+                new ModelAndView(model, "error")
+            );
         });
 
         // Generate voice TwiML
