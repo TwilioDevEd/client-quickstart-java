@@ -5,10 +5,7 @@ import static spark.Spark.post;
 import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.afterAfter;
-import spark.template.thymeleaf.ThymeleafTemplateEngine;
-import spark.ModelAndView;
 
-import java.util.Map;
 import java.util.HashMap;
 
 import com.github.javafaker.Faker;
@@ -118,12 +115,6 @@ public class Webapp {
             return Webapp.createJsonAccessToken(identity);
         });
 
-        get("/error", (req, res) -> {
-            Map<String, Object> model = new HashMap<String, Object>();
-            return new ThymeleafTemplateEngine().render(
-                new ModelAndView(model, "error")
-            );
-        });
 
         // Generate voice TwiML
         post("/voice", "application/x-www-form-urlencoded", (request, response) -> {
