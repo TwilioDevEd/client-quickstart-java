@@ -5,12 +5,17 @@ import static spark.Spark.post;
 import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.afterAfter;
+import static spark.Spark.internalServerError;
+import static spark.Spark.notFound;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import io.github.cdimascio.dotenv.Dotenv;
+import spark.ModelAndView;
+import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 // Token generation imports
 import com.twilio.jwt.accesstoken.AccessToken;
@@ -101,6 +106,20 @@ public class Webapp {
 
         // Serve static files from src/main/resources/public
         staticFileLocation("/public");
+
+        // Handle errors
+        internalServerError((request, response) -> {
+            Map<String, Object> model = new HashMap<String, Object>();
+            return new ThymeleafTemplateEngine().render(
+                new ModelAndView(model, "error")
+            );
+        });
+        notFound((request, response) -> {
+            Map<String, Object> model = new HashMap<String, Object>();
+            return new ThymeleafTemplateEngine().render(
+                new ModelAndView(model, "error")
+            );
+        });
 
         // Log all requests and responses
         afterAfter(new LoggingFilter());
