@@ -5,11 +5,17 @@ import static spark.Spark.post;
 import static spark.Spark.port;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.afterAfter;
+import static spark.Spark.internalServerError;
+import static spark.Spark.notFound;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
+import io.github.cdimascio.dotenv.Dotenv;
+import spark.ModelAndView;
+import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 // Token generation imports
 import com.twilio.jwt.accesstoken.AccessToken;
@@ -23,7 +29,8 @@ import com.twilio.twiml.voice.Client;
 import com.twilio.twiml.voice.Say;
 
 public class Webapp {
-    
+    private static Dotenv env = Dotenv.configure().ignoreIfMissing().load();
+
     public static String generateIdentity() {
         // Create a Faker instance to generate a random username for the connecting user
         Faker faker = new Faker();
@@ -31,10 +38,10 @@ public class Webapp {
     }
 
     public static String createJsonAccessToken(String identity) {
-        String acctSid = System.getenv("TWILIO_ACCOUNT_SID");
-        String applicationSid = System.getenv("TWILIO_TWIML_APP_SID");
-        String apiKey = System.getenv("API_KEY");
-        String apiSecret = System.getenv("API_SECRET");
+        String acctSid = env.get("TWILIO_ACCOUNT_SID");
+        String applicationSid = env.get("TWILIO_TWIML_APP_SID");
+        String apiKey = env.get("API_KEY");
+        String apiSecret = env.get("API_SECRET");
         // Create Voice grant
         VoiceGrant grant = new VoiceGrant();
         grant.setOutgoingApplicationSid(applicationSid);
@@ -77,7 +84,7 @@ public class Webapp {
         
         if (to != null) {
             Dial.Builder dialBuilder = new Dial.Builder()
-                    .callerId(System.getenv("TWILIO_CALLER_ID"));
+                    .callerId(env.get("TWILIO_CALLER_ID"));
 
             Dial.Builder dialBuilderWithReceiver = Webapp.addChildReceiver(dialBuilder, to);
 
@@ -100,6 +107,20 @@ public class Webapp {
         // Serve static files from src/main/resources/public
         staticFileLocation("/public");
 
+        // Handle errors
+        internalServerError((request, response) -> {
+            Map<String, Object> model = new HashMap<String, Object>();
+            return new ThymeleafTemplateEngine().render(
+                new ModelAndView(model, "error")
+            );
+        });
+        notFound((request, response) -> {
+            Map<String, Object> model = new HashMap<String, Object>();
+            return new ThymeleafTemplateEngine().render(
+                new ModelAndView(model, "error")
+            );
+        });
+
         // Log all requests and responses
         afterAfter(new LoggingFilter());
 
@@ -112,6 +133,7 @@ public class Webapp {
             response.header("Content-Type", "application/json");
             return Webapp.createJsonAccessToken(identity);
         });
+
 
         // Generate voice TwiML
         post("/voice", "application/x-www-form-urlencoded", (request, response) -> {
