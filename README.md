@@ -2,25 +2,16 @@
 <img  src="https://static0.twilio.com/marketing/bundles/marketing/img/logos/wordmark-red.svg"  alt="Twilio"  width="250"  />
 </a>
 
+:warning:
+
+This is a deprecated project.
+
+Please go to the [Twilio Voice JavaScript SDK quickstart for Java](https://github.com/TwilioDevEd/voice-javascript-sdk-quickstart-java)
+
+:warning:
+
+
 # Twilio Client Quickstart for Java
-
-![](https://github.com/TwilioDevEd/client-quickstart-java/workflows/Java/badge.svg)
-
-> We are currently in the process of updating this sample template. If you are encountering any issues with the sample, please open an issue at [github.com/twilio-labs/code-exchange/issues](https://github.com/twilio-labs/code-exchange/issues) and we'll try to help you.
-
-## About
-
-Implementations in other languages:
-
-| .NET | Python | Node | PHP | Ruby |
-| :--- | :--- | :----- | :-- | :--- |
-| [Done](https://github.com/TwilioDevEd/client-quickstart-csharp) | [Done](https://github.com/TwilioDevEd/client-quickstart-python)  | [Done](https://github.com/TwilioDevEd/client-quickstart-node)  | [Done](https://github.com/TwilioDevEd/client-quickstart-php) | [Done](https://github.com/TwilioDevEd/client-quickstart-ruby)  |
-
-<!--
-### How it works
-
-**TODO: Describe how it works**
--->
 
 ## Set up
 
